@@ -69,6 +69,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
   const [loading, setLoading] = useState(isSupabaseConfigured)
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
 
   const [rating, setRating] = useState(0)
   const [body, setBody] = useState('')
@@ -113,6 +114,14 @@ export function ExamBoard({ courseId }: { courseId: string }) {
       ? reports.reduce((sum, report) => sum + report.rating, 0) / reports.length
       : null,
     [reports],
+  )
+  const availableYears = useMemo(
+    () => [...new Set(reports.map((report) => report.taken_year))].sort((a, b) => b - a),
+    [reports],
+  )
+  const visibleReports = useMemo(
+    () => yearFilter === 'all' ? reports : reports.filter((report) => report.taken_year === yearFilter),
+    [reports, yearFilter],
   )
 
   async function submitReport(event: FormEvent<HTMLFormElement>) {
@@ -308,13 +317,24 @@ export function ExamBoard({ courseId }: { courseId: string }) {
 
       {message && <StatusNotice>{message}</StatusNotice>}
 
+      {availableYears.length > 1 && (
+        <div className="exam-year-filter">
+          <label htmlFor="exam-year">履修年度</label>
+          <select id="exam-year" value={yearFilter} onChange={(event) => setYearFilter(event.target.value === 'all' ? 'all' : Number(event.target.value))}>
+            <option value="all">すべて</option>
+            {availableYears.map((year) => <option value={year} key={year}>{year}年度</option>)}
+          </select>
+          <span>{visibleReports.length}件</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="empty-state">読み込み中...</div>
       ) : reports.length === 0 ? (
         <div className="empty-state">テスト情報はまだありません。</div>
       ) : (
         <ol className="exam-list">
-          {reports.map((report) => (
+          {visibleReports.map((report) => (
             <li className="exam-item" key={report.id}>
               <div className="exam-item-header">
                 <div className="stars small">

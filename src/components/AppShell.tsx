@@ -18,6 +18,7 @@ export function AppShell({ children }: PropsWithChildren) {
           <span className="site-description">早稲田大学非公式・科目別掲示板</span>
           <nav className="header-links" aria-label="補助メニュー">
             <Link to="/boards">掲示板一覧</Link>
+            <Link to="/saved">お気に入り</Link>
             <Link to="/guide">利用案内</Link>
             <a href="https://www.wsl.waseda.jp/syllabus/JAA101.php?pLng=jp" target="_blank" rel="noreferrer">
               公式シラバス
@@ -36,6 +37,7 @@ export function AppShell({ children }: PropsWithChildren) {
         </div>
         <div className="footer-links">
           <Link to="/guide">利用案内・削除依頼</Link>
+          <Link to="/admin">管理者</Link>
           <a href="mailto:wasechan8@gmail.com">連絡先</a>
           <a href="https://www.wsl.waseda.jp/syllabus/JAA101.php?pLng=jp" target="_blank" rel="noreferrer">
             早稲田大学 公式シラバス

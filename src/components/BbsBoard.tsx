@@ -1,11 +1,12 @@
 import {
   Flag,
   MessageCircle,
+  Reply,
   Send,
   ThumbsDown,
   ThumbsUp,
 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { ensureAnonymousSession, isSupabaseConfigured, supabase } from '../lib/supabase'
 import { getErrorMessage } from '../lib/errors'
 import type { BbsPost, VoteChoice } from '../types/community'
@@ -26,6 +27,25 @@ function formatDate(value: string) {
   }).format(new Date(value))
 }
 
+function renderBody(body: string, onReference: (postNo: number) => void): ReactNode[] {
+  const parts: ReactNode[] = []
+  const pattern = />>(\d{1,10})/g
+  let cursor = 0
+  for (const match of body.matchAll(pattern)) {
+    const index = match.index ?? 0
+    if (index > cursor) parts.push(body.slice(cursor, index))
+    const postNo = Number(match[1])
+    parts.push(
+      <button className="reply-reference" type="button" key={`${index}-${postNo}`} onClick={() => onReference(postNo)}>
+        &gt;&gt;{postNo}
+      </button>,
+    )
+    cursor = index + match[0].length
+  }
+  if (cursor < body.length) parts.push(body.slice(cursor))
+  return parts
+}
+
 export function BbsBoard({ courseId }: { courseId: string }) {
   const [posts, setPosts] = useState<BbsPost[]>([])
   const [votes, setVotes] = useState<Record<string, VoteChoice>>({})
@@ -36,6 +56,7 @@ export function BbsBoard({ courseId }: { courseId: string }) {
   const [busyPostId, setBusyPostId] = useState<string | null>(null)
   const [reportingPostId, setReportingPostId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const composerRef = useRef<HTMLTextAreaElement>(null)
 
   const loadBoard = useCallback(async () => {
     if (!supabase) return
@@ -46,7 +67,7 @@ export function BbsBoard({ courseId }: { courseId: string }) {
         await Promise.all([
           supabase
             .from('bbs_posts')
-            .select('id,course_id,anon_label,body,like_count,dislike_count,created_at')
+            .select('id,course_id,post_no,anon_label,body,like_count,dislike_count,created_at')
             .eq('course_id', courseId)
             .order('created_at', { ascending: false })
             .limit(100),
@@ -77,10 +98,17 @@ export function BbsBoard({ courseId }: { courseId: string }) {
       (a, b) => b.like_count - b.dislike_count - (a.like_count - a.dislike_count),
     )
   }, [posts, sortMode])
-  const postNumberById = useMemo(
-    () => Object.fromEntries(posts.map((post, index) => [post.id, posts.length - index])),
-    [posts],
-  )
+
+  function replyTo(postNo: number) {
+    setBody((current) => `${current}${current && !current.endsWith('\n') ? '\n' : ''}>>${postNo}\n`)
+    window.setTimeout(() => composerRef.current?.focus(), 0)
+  }
+
+  function scrollToPost(postNo: number) {
+    const target = document.getElementById(`post-${postNo}`)
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    else setMessage(`>>${postNo} は現在表示されていません`)
+  }
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -179,16 +207,16 @@ export function BbsBoard({ courseId }: { courseId: string }) {
       ) : (
         <ol className="post-list">
           {sortedPosts.map((post) => (
-            <li className="post-item" key={post.id}>
+            <li className="post-item" id={`post-${post.post_no}`} key={post.id}>
               <div className="post-meta">
-                <span className="post-number">{postNumberById[post.id]}</span>
+                <span className="post-number">{post.post_no}</span>
                 <span>：</span>
                 <strong>名無しさん</strong>
                 <span>：</span>
                 <time dateTime={post.created_at}>{formatDate(post.created_at)}</time>
                 <span className="post-id">ID:{post.anon_label.replace(/^匿名-/, '')}</span>
               </div>
-              <p className="post-body">{post.body}</p>
+              <p className="post-body">{renderBody(post.body, scrollToPost)}</p>
               <div className="post-actions">
                 <button
                   type="button"
@@ -198,6 +226,9 @@ export function BbsBoard({ courseId }: { courseId: string }) {
                   aria-label="参考になった"
                 >
                   <ThumbsUp size={16} /> {post.like_count}
+                </button>
+                <button type="button" className="vote-button" onClick={() => replyTo(post.post_no)}>
+                  <Reply size={15} /> 返信
                 </button>
                 <button
                   type="button"
@@ -241,6 +272,7 @@ export function BbsBoard({ courseId }: { courseId: string }) {
           <span className="character-count">{body.length}/1000</span>
         </div>
         <textarea
+          ref={composerRef}
           value={body}
           onChange={(event) => setBody(event.target.value)}
           maxLength={1000}

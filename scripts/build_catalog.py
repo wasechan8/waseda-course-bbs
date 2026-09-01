@@ -185,6 +185,7 @@ def build_catalog(sources: list[Path], output: Path) -> None:
         old_file.unlink()
 
     faculties: list[dict[str, object]] = []
+    course_index: dict[str, dict[str, object]] = {}
     for slug in FACULTY_ORDER:
         courses = courses_by_faculty.get(slug, [])
         if not courses:
@@ -194,6 +195,11 @@ def build_catalog(sources: list[Path], output: Path) -> None:
             json.dumps(courses, ensure_ascii=False, separators=(",", ":")),
             encoding="utf-8",
         )
+        for course in courses:
+            course_index[str(course["id"])] = {
+                "name": course["name"],
+                "facultySlug": course["facultySlug"],
+            }
         faculties.append(
             {
                 "slug": slug,
@@ -205,6 +211,10 @@ def build_catalog(sources: list[Path], output: Path) -> None:
     output.mkdir(parents=True, exist_ok=True)
     (output / "faculties.json").write_text(
         json.dumps(faculties, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    (output / "course-index.json").write_text(
+        json.dumps(course_index, ensure_ascii=False, separators=(",", ":")),
         encoding="utf-8",
     )
     print(f"Built {sum(len(value) for value in courses_by_faculty.values()):,} courses")

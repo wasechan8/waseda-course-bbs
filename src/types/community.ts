@@ -3,6 +3,7 @@ export type VoteChoice = 'up' | 'down'
 export type BbsPost = {
   id: string
   course_id: string
+  post_no: number
   anon_label: string
   body: string
   like_count: number

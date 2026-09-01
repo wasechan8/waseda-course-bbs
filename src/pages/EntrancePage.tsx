@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { RecentPostsFeed } from '../components/RecentPostsFeed'
 
 export function EntrancePage() {
   return (
@@ -21,6 +22,7 @@ export function EntrancePage() {
         <img className="portal-logo" src={`${import.meta.env.BASE_URL}wasechan-logo-v3.png`} alt="わせチャン" />
         <p>早稲田大学非公式・科目別掲示板</p>
         <Link className="portal-enter" to="/boards">掲示板に入る</Link>
+        <RecentPostsFeed />
       </section>
 
       <footer className="portal-footer">

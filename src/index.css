@@ -136,6 +136,73 @@ a:visited {
   font-size: 14px;
 }
 
+.portal-recent {
+  position: relative;
+  z-index: 1;
+  width: min(700px, calc(100vw - 32px));
+  margin-top: 28px;
+  border: 1px solid #aaaaaa;
+  background: rgba(255, 255, 255, 0.94);
+  text-align: left;
+}
+
+.portal-recent-heading {
+  min-height: 32px;
+  padding: 6px 9px;
+  border-bottom: 1px solid #aaaaaa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bar);
+}
+
+.portal-recent-heading h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.portal-recent-heading span,
+.portal-recent > p {
+  color: #666666;
+  font-size: 10px;
+}
+
+.portal-recent ol {
+  margin: 0;
+  padding: 5px 9px 6px 29px;
+}
+
+.portal-recent li {
+  margin: 4px 0;
+  display: grid;
+  grid-template-columns: minmax(130px, 210px) minmax(0, 1fr) auto;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.portal-recent li a,
+.portal-recent-body {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.portal-recent time {
+  color: #777777;
+  white-space: nowrap;
+}
+
+.portal-recent > p {
+  margin: 0;
+  padding: 4px 9px;
+  border-top: 1px dotted #bbbbbb;
+  text-align: right;
+}
+
 .portal-footer {
   padding: 20px 24px 26px;
   border-top: 1px solid #cccccc;
@@ -644,6 +711,41 @@ a:visited {
   font-size: 12px;
 }
 
+.course-utility-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.course-utility-actions button,
+.share-menu button,
+.share-menu a {
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid #999999;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eeeeee;
+  color: #111111;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.course-utility-actions button.active {
+  border-color: #a06000;
+  color: #8a5200;
+}
+
+.share-menu {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  gap: 4px;
+}
+
 .official-link {
   position: absolute;
   top: 14px;
@@ -759,6 +861,17 @@ a:visited {
 
 .post-item {
   padding: 12px 12px 14px;
+  scroll-margin-top: 18px;
+}
+
+.reply-reference {
+  margin: 0;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font-size: inherit;
+  text-decoration: underline;
 }
 
 .post-meta {
@@ -1163,6 +1276,28 @@ a:visited {
   border-top: 1px solid var(--line);
 }
 
+.exam-year-filter {
+  min-height: 39px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eeeeee;
+  font-size: 11px;
+}
+
+.exam-year-filter select {
+  height: 27px;
+  border: 1px solid #999999;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.exam-year-filter span {
+  color: #666666;
+}
+
 .exam-item {
   padding: 12px;
   border-bottom: 1px solid var(--line-soft);
@@ -1296,6 +1431,208 @@ a:visited {
 
 .site-footer a {
   white-space: nowrap;
+}
+
+.saved-courses-page,
+.admin-page {
+  width: min(920px, calc(100% - 32px));
+}
+
+.saved-section,
+.admin-section {
+  border: 1px solid var(--line);
+  border-top: 0;
+  background: #ffffff;
+}
+
+.saved-section h2,
+.admin-section h2 {
+  margin: 0;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #eeeeee;
+  font-size: 14px;
+}
+
+.saved-course-list,
+.moderation-list,
+.admin-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saved-course-list li {
+  padding: 8px 11px;
+  border-bottom: 1px dotted #bbbbbb;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.saved-course-list li span,
+.saved-empty {
+  color: #666666;
+  font-size: 11px;
+}
+
+.saved-empty {
+  margin: 0;
+  padding: 18px 12px;
+}
+
+.admin-login-page {
+  min-height: 620px;
+}
+
+.admin-login {
+  width: min(430px, 100%);
+  margin: 38px auto;
+  padding: 22px;
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 13px;
+  background: #ffffff;
+}
+
+.admin-login > svg {
+  margin: 0 auto;
+}
+
+.admin-login h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 20px;
+}
+
+.admin-login label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-login input,
+.admin-invite-form input {
+  min-width: 0;
+  height: 35px;
+  padding: 4px 7px;
+  border: 1px solid #999999;
+  border-radius: 0;
+}
+
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font-size: 11px;
+  text-decoration: underline;
+}
+
+.admin-heading {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-heading h1,
+.admin-heading p {
+  margin: 0;
+}
+
+.admin-heading h1 {
+  font-size: 22px;
+}
+
+.admin-heading p {
+  margin-top: 5px;
+  color: #666666;
+  font-size: 11px;
+}
+
+.admin-heading button,
+.admin-invite-form button,
+.moderation-actions button {
+  min-height: 30px;
+  padding: 3px 8px;
+  border: 1px solid #999999;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eeeeee;
+  font-size: 11px;
+}
+
+.admin-section {
+  margin-bottom: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.moderation-list > li {
+  padding: 11px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.moderation-list > li > p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.moderation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  color: #666666;
+  font-size: 10px;
+}
+
+.moderation-meta strong {
+  color: #111111;
+  font-size: 11px;
+}
+
+.moderation-reasons {
+  color: var(--negative);
+  font-weight: 700;
+}
+
+.moderation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.moderation-actions .danger-button {
+  border-color: #a61d2d;
+  color: #a61d2d;
+}
+
+.admin-invite-form {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.admin-list li {
+  padding: 7px 10px;
+  border-top: 1px dotted #bbbbbb;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.admin-list strong {
+  color: var(--positive);
 }
 
 @media (max-width: 760px) {
@@ -1469,6 +1806,25 @@ a:visited {
   .portal-main {
     min-height: 430px;
     padding-top: 60px;
+  }
+
+  .portal-recent li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .portal-recent-body {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .share-menu {
+    position: static;
+    margin-top: 7px;
+  }
+
+  .saved-course-list li {
+    grid-template-columns: 1fr;
+    gap: 3px;
   }
 
   .portal-mascot {
