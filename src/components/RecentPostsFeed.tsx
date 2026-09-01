@@ -1,4 +1,3 @@
-import { Radio } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
@@ -17,6 +16,31 @@ type RecentPost = {
   created_at: string
   lounge_title: string | null
   campus_slug: string | null
+}
+
+const FACULTY_ABBREVIATIONS: Record<string, string> = {
+  politics_economics: '政経',
+  law: '法',
+  education: '教育',
+  commerce: '商',
+  social_sciences: '社学',
+  human_sciences: '人科',
+  sport_sciences: 'スポ科',
+  international: '国教',
+  culture_community: '文構',
+  letters: '文',
+  human_correspondence: '人科通信',
+  fundamental_sci: '基幹',
+  creative_sci: '創造',
+  advanced_sci: '先進',
+  global_education: 'GEC',
+}
+
+const CAMPUS_ABBREVIATIONS: Record<string, string> = {
+  waseda: '早',
+  toyama: '戸',
+  tokorozawa: '所',
+  nishiwaseda: '西',
 }
 
 function relativeTime(value: string) {
@@ -68,7 +92,7 @@ export function RecentPostsFeed() {
   return (
     <section className="portal-recent" aria-labelledby="recent-posts-title">
       <div className="portal-recent-heading">
-        <h2 id="recent-posts-title"><Radio size={15} /> 新着の書き込み</h2>
+        <h2 id="recent-posts-title">新着の書き込み</h2>
         <span>{updatedAt ? `${updatedAt.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} 更新` : '取得中'}</span>
       </div>
       <ol>
@@ -80,7 +104,13 @@ export function RecentPostsFeed() {
             : course
               ? `/faculty/${course.facultySlug}/course/${post.course_id}`
               : '/boards'
-          const boardName = post.lounge_title ?? course?.name ?? '科目掲示板'
+          const facultyAbbreviation = course ? FACULTY_ABBREVIATIONS[course.facultySlug] : null
+          const campusAbbreviation = post.campus_slug ? CAMPUS_ABBREVIATIONS[post.campus_slug] : null
+          const boardName = loungeId
+            ? `喫煙所（${campusAbbreviation ?? '他'}）`
+            : course
+              ? `${facultyAbbreviation ?? course.facultySlug}　${course.name}`
+              : '科目掲示板'
           return (
             <li key={post.id}>
               <Link to={href}>{boardName}</Link>
