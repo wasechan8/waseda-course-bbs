@@ -234,8 +234,8 @@ export function AdminPage() {
                 onChange={() => previewTheme(key)}
               />
               <span className="theme-swatches" aria-hidden="true">
-                <i style={{ backgroundColor: theme.colors.page }} />
                 <i style={{ backgroundColor: theme.colors.bar }} />
+                <i style={{ backgroundColor: theme.colors.barStrong }} />
                 <i style={{ backgroundColor: theme.colors.link }} />
               </span>
               <span>{theme.name}</span>

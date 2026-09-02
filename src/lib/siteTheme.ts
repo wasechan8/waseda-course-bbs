@@ -48,9 +48,9 @@ export function applySiteTheme(themeKey: ThemeKey) {
   const root = document.documentElement
   const colors = SITE_THEMES[themeKey].colors
   root.dataset.siteTheme = themeKey
-  root.style.setProperty('--page', colors.page)
-  root.style.setProperty('--surface', colors.surface)
-  root.style.setProperty('--thread', colors.thread)
+  root.style.setProperty('--page', '#ffffff')
+  root.style.setProperty('--surface', '#ffffff')
+  root.style.setProperty('--thread', '#ffffff')
   root.style.setProperty('--bar', colors.bar)
   root.style.setProperty('--bar-strong', colors.barStrong)
   root.style.setProperty('--control', colors.control)
