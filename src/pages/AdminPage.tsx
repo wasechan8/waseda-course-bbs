@@ -1,8 +1,9 @@
-import { LogOut, Shield, Trash2, UserPlus } from 'lucide-react'
+import { LogOut, Palette, Shield, Trash2, UserPlus } from 'lucide-react'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { getErrorMessage } from '../lib/errors'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { applySiteTheme, DEFAULT_THEME_KEY, isThemeKey, SITE_THEMES, type SiteTheme, type ThemeKey } from '../lib/siteTheme'
 import { StatusNotice } from '../components/StatusNotice'
 
 type AdminEntry = {
@@ -32,6 +33,8 @@ const REASON_LABELS: Record<string, string> = {
   other: 'その他',
 }
 
+const THEME_OPTIONS = Object.entries(SITE_THEMES) as [ThemeKey, SiteTheme][]
+
 export function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -42,6 +45,7 @@ export function AdminPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [admins, setAdmins] = useState<AdminEntry[]>([])
   const [queue, setQueue] = useState<ModerationItem[]>([])
+  const [themeKey, setThemeKey] = useState<ThemeKey>(DEFAULT_THEME_KEY)
   const [message, setMessage] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -65,14 +69,17 @@ export function AdminPage() {
 
   const loadAdminData = useCallback(async () => {
     if (!supabase) return
-    const [adminResult, queueResult] = await Promise.all([
+    const [adminResult, queueResult, themeResult] = await Promise.all([
       supabase.rpc('admin_list_admins'),
       supabase.rpc('admin_moderation_queue'),
+      supabase.from('site_theme').select('theme_key').eq('id', 'global').maybeSingle(),
     ])
     if (adminResult.error) throw adminResult.error
     if (queueResult.error) throw queueResult.error
+    if (themeResult.error) throw themeResult.error
     setAdmins((adminResult.data ?? []) as AdminEntry[])
     setQueue((queueResult.data ?? []) as ModerationItem[])
+    if (isThemeKey(themeResult.data?.theme_key)) setThemeKey(themeResult.data.theme_key)
   }, [])
 
   useEffect(() => {
@@ -145,6 +152,26 @@ export function AdminPage() {
     }
   }
 
+  function previewTheme(nextThemeKey: ThemeKey) {
+    setThemeKey(nextThemeKey)
+    applySiteTheme(nextThemeKey)
+  }
+
+  async function saveTheme() {
+    if (!supabase) return
+    setBusy(true)
+    setMessage(null)
+    try {
+      const { error } = await supabase.rpc('admin_update_site_theme', { p_theme_key: themeKey })
+      if (error) throw error
+      setMessage(`配色「${SITE_THEMES[themeKey].name}」を公開サイトへ反映しました。`)
+    } catch (error) {
+      setMessage(getErrorMessage(error, '配色を保存できませんでした'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function deleteItem(item: ModerationItem) {
     if (!supabase || !window.confirm('この投稿を完全に削除します。元に戻せません。続けますか？')) return
     setBusy(true)
@@ -192,6 +219,34 @@ export function AdminPage() {
         <button type="button" onClick={() => void supabase?.auth.signOut()}><LogOut size={15} /> ログアウト</button>
       </div>
       {message && <StatusNotice>{message}</StatusNotice>}
+
+      <section className="admin-section theme-admin-section">
+        <h2><Palette size={16} /> 外観設定</h2>
+        <fieldset className="theme-options">
+          <legend>掲示板の配色</legend>
+          {THEME_OPTIONS.map(([key, theme]) => (
+            <label className={themeKey === key ? 'theme-option selected' : 'theme-option'} key={key}>
+              <input
+                type="radio"
+                name="site-theme"
+                value={key}
+                checked={themeKey === key}
+                onChange={() => previewTheme(key)}
+              />
+              <span className="theme-swatches" aria-hidden="true">
+                <i style={{ backgroundColor: theme.colors.page }} />
+                <i style={{ backgroundColor: theme.colors.bar }} />
+                <i style={{ backgroundColor: theme.colors.link }} />
+              </span>
+              <span>{theme.name}</span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="theme-save-row">
+          <span>選択するとこの画面でプレビューできます。</span>
+          <button type="button" disabled={busy} onClick={() => void saveTheme()}>この配色を保存</button>
+        </div>
+      </section>
 
       <section className="admin-section">
         <h2>確認待ち・通報</h2>

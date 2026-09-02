@@ -1,16 +1,20 @@
 :root {
   font-family: Arial, "MS PGothic", "Yu Gothic UI", Meiryo, sans-serif;
-  color: #111111;
-  background: #ffffff;
+  color: var(--ink);
+  background: var(--page);
   font-synthesis: none;
   --page: #ffffff;
+  --surface: #ffffff;
   --thread: #efefef;
   --bar: #ccffcc;
   --bar-strong: #a8dda8;
+  --control: #dddddd;
+  --subtle: #eeeeee;
   --line: #aaaaaa;
   --line-soft: #d2d2d2;
   --link: #0000ee;
   --visited: #551a8b;
+  --ink: #111111;
   --title: #e60000;
   --name: #008000;
   --section: #cc3300;
@@ -39,7 +43,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: var(--page);
-  color: #111111;
+  color: var(--ink);
 }
 
 button,
@@ -78,7 +82,7 @@ a:visited {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #ffffff;
+  background: var(--page);
 }
 
 .portal-nav {
@@ -132,7 +136,7 @@ a:visited {
   z-index: 1;
   padding: 7px 22px;
   border: 1px solid #888888;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface);
   font-size: 14px;
 }
 
@@ -142,7 +146,7 @@ a:visited {
   width: min(700px, calc(100vw - 32px));
   margin-top: 28px;
   border: 1px solid #aaaaaa;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface);
   text-align: left;
 }
 
@@ -153,7 +157,6 @@ a:visited {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bar);
 }
 
 .portal-recent-heading h2 {
@@ -289,7 +292,7 @@ a:visited {
 
 .site-header {
   border-bottom: 1px solid #cccccc;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .header-inner {
@@ -397,7 +400,7 @@ a:visited {
 
 .entrance-search button {
   border-left: 0;
-  background: #eeeeee;
+  background: var(--subtle);
   font-size: 12px;
   font-weight: 700;
 }
@@ -448,7 +451,7 @@ a:visited {
 
 .campus-section {
   border: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .campus-section h2,
@@ -458,7 +461,7 @@ a:visited {
   padding: 8px 12px;
   border-bottom: 1px solid var(--line);
   background: var(--bar);
-  color: #111111;
+  color: var(--ink);
 }
 
 .campus-section h2 {
@@ -528,7 +531,7 @@ a:visited {
   display: grid;
   grid-template-columns: minmax(260px, 1fr) repeat(3, minmax(135px, 175px));
   gap: 7px;
-  background: #eeeeee;
+  background: var(--subtle);
 }
 
 .search-field,
@@ -560,8 +563,8 @@ a:visited {
   border: 1px solid #999999;
   border-radius: 0;
   outline: 0;
-  background: #ffffff;
-  color: #111111;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .search-field input,
@@ -591,7 +594,7 @@ a:visited {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8f8f8;
+  background: var(--surface);
   font-size: 12px;
 }
 
@@ -599,8 +602,8 @@ a:visited {
   padding: 2px 7px;
   border: 1px solid #999999;
   border-radius: 0;
-  background: #eeeeee;
-  color: #111111;
+  background: var(--subtle);
+  color: var(--ink);
   font-size: 12px;
 }
 
@@ -620,7 +623,7 @@ a:visited {
   grid-template-columns: 34px minmax(0, 1fr) 150px;
   align-items: start;
   gap: 7px;
-  background: #ffffff;
+  background: var(--surface);
   content-visibility: auto;
   contain-intrinsic-size: auto 68px;
 }
@@ -674,14 +677,14 @@ a:visited {
   border: 1px solid var(--line);
   border-top: 0;
   border-radius: 0;
-  background: #eeeeee;
-  color: #111111;
+  background: var(--subtle);
+  color: var(--ink);
   font-size: 12px;
   font-weight: 700;
 }
 
 .load-more:hover {
-  background: #dddddd;
+  background: var(--control);
 }
 
 .detail-page {
@@ -727,8 +730,8 @@ a:visited {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #eeeeee;
-  color: #111111;
+  background: var(--subtle);
+  color: var(--ink);
   font-size: 11px;
   text-decoration: none;
 }
@@ -760,7 +763,7 @@ a:visited {
   margin: 9px 0 0;
   border: 1px solid var(--line);
   display: flex;
-  background: #eeeeee;
+  background: var(--subtle);
 }
 
 .detail-tabs button {
@@ -777,8 +780,8 @@ a:visited {
 }
 
 .detail-tabs button.active {
-  background: #ffffff;
-  color: #111111;
+  background: var(--surface);
+  color: var(--ink);
   text-decoration: none;
   font-weight: 700;
 }
@@ -797,7 +800,7 @@ a:visited {
   padding: 9px 11px;
   border: 1px solid #9a9a9a;
   border-left: 5px solid #4d6a83;
-  background: #ffffff;
+  background: var(--surface);
   color: #333333;
   font-size: 12px;
 }
@@ -809,7 +812,7 @@ a:visited {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #eeeeee;
+  background: var(--subtle);
 }
 
 .result-count {
@@ -828,8 +831,8 @@ a:visited {
   height: 27px;
   border: 1px solid #999999;
   border-radius: 0;
-  background: #eeeeee;
-  color: #111111;
+  background: var(--subtle);
+  color: var(--ink);
   font-size: 11px;
 }
 
@@ -838,7 +841,7 @@ a:visited {
 }
 
 .segmented-control button.active {
-  background: #ffffff;
+  background: var(--surface);
   font-weight: 700;
 }
 
@@ -879,7 +882,7 @@ a:visited {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 3px;
-  color: #111111;
+  color: var(--ink);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -890,11 +893,11 @@ a:visited {
 }
 
 .post-number {
-  color: #111111;
+  color: var(--ink);
 }
 
 .post-id {
-  color: #111111;
+  color: var(--ink);
 }
 
 .post-body {
@@ -921,7 +924,7 @@ a:visited {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #eeeeee;
+  background: var(--subtle);
   color: #333333;
   font-size: 11px;
 }
@@ -950,7 +953,7 @@ a:visited {
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  background: #ffffff;
+  background: var(--surface);
   font-size: 11px;
 }
 
@@ -958,7 +961,7 @@ a:visited {
   min-height: 25px;
   border: 1px solid #999999;
   border-radius: 0;
-  background: #eeeeee;
+  background: var(--subtle);
   font-size: 11px;
 }
 
@@ -968,7 +971,7 @@ a:visited {
   margin: 10px;
   padding: 12px;
   border: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .composer-heading {
@@ -1041,14 +1044,14 @@ a:visited {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  background: #eeeeee;
-  color: #111111;
+  background: var(--subtle);
+  color: var(--ink);
   font-size: 12px;
   font-weight: 700;
 }
 
 .primary-button:hover {
-  background: #dddddd;
+  background: var(--control);
 }
 
 .primary-button:disabled {
@@ -1064,7 +1067,7 @@ a:visited {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .exam-summary > div:first-child {
@@ -1165,8 +1168,8 @@ a:visited {
   bottom: -7px;
   left: 0;
   padding-right: 8px;
-  background: #ffffff;
-  color: #666666;
+  background: var(--surface);
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -1199,7 +1202,7 @@ a:visited {
 .balance-field {
   padding: 12px;
   border: 1px solid var(--line-soft);
-  background: #f7f7f7;
+  background: var(--surface);
 }
 
 .check-label {
@@ -1283,7 +1286,7 @@ a:visited {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #eeeeee;
+  background: var(--subtle);
   font-size: 11px;
 }
 
@@ -1291,7 +1294,7 @@ a:visited {
   height: 27px;
   border: 1px solid #999999;
   border-radius: 0;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .exam-year-filter span {
@@ -1348,7 +1351,7 @@ a:visited {
 .balance-track {
   height: 6px;
   display: flex;
-  background: #dddddd;
+  background: var(--control);
 }
 
 .balance-track span {
@@ -1442,7 +1445,7 @@ a:visited {
 .admin-section {
   border: 1px solid var(--line);
   border-top: 0;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .saved-section h2,
@@ -1453,7 +1456,7 @@ a:visited {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #eeeeee;
+  background: var(--subtle);
   font-size: 14px;
 }
 
@@ -1496,7 +1499,7 @@ a:visited {
   border: 1px solid var(--line);
   display: grid;
   gap: 13px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .admin-login > svg {
@@ -1559,7 +1562,8 @@ a:visited {
 
 .admin-heading button,
 .admin-invite-form button,
-.moderation-actions button {
+.moderation-actions button,
+.theme-save-row button {
   min-height: 30px;
   padding: 3px 8px;
   border: 1px solid #999999;
@@ -1567,13 +1571,82 @@ a:visited {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #eeeeee;
+  background: var(--subtle);
   font-size: 11px;
 }
 
 .admin-section {
   margin-bottom: 14px;
   border-top: 1px solid var(--line);
+}
+
+.theme-options {
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.theme-options legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.theme-option {
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid var(--line-soft);
+  display: grid;
+  grid-template-columns: auto 46px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.theme-option:hover,
+.theme-option.selected {
+  border-color: var(--link);
+  outline: 1px solid var(--link);
+}
+
+.theme-option input {
+  margin: 0;
+}
+
+.theme-swatches {
+  height: 20px;
+  border: 1px solid #888888;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+}
+
+.theme-swatches i {
+  display: block;
+}
+
+.theme-save-row {
+  padding: 9px 10px;
+  border-top: 1px dotted var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.theme-save-row span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.theme-save-row button {
+  white-space: nowrap;
 }
 
 .moderation-list > li {
@@ -1596,7 +1669,7 @@ a:visited {
 }
 
 .moderation-meta strong {
-  color: #111111;
+  color: var(--ink);
   font-size: 11px;
 }
 
@@ -1825,6 +1898,19 @@ a:visited {
   .saved-course-list li {
     grid-template-columns: 1fr;
     gap: 3px;
+  }
+
+  .theme-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .theme-save-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .theme-save-row button {
+    justify-content: center;
   }
 
   .portal-mascot {

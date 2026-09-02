@@ -1,8 +1,34 @@
-import type { PropsWithChildren } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { applySiteTheme, DEFAULT_THEME_KEY, isThemeKey } from '../lib/siteTheme'
 
 export function AppShell({ children }: PropsWithChildren) {
   const { pathname } = useLocation()
+
+  useEffect(() => {
+    const client = supabase
+    applySiteTheme(DEFAULT_THEME_KEY)
+    if (!client) return
+
+    const loadTheme = async () => {
+      const { data } = await client
+        .from('site_theme')
+        .select('theme_key')
+        .eq('id', 'global')
+        .maybeSingle()
+      if (isThemeKey(data?.theme_key)) applySiteTheme(data.theme_key)
+    }
+
+    void loadTheme()
+    const channel = client
+      .channel('public-site-theme')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_theme' }, () => void loadTheme())
+      .subscribe()
+    return () => {
+      void client.removeChannel(channel)
+    }
+  }, [])
 
   if (pathname === '/') {
     return <main className="portal-shell">{children}</main>
