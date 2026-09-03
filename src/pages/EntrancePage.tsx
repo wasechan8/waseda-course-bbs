@@ -13,12 +13,6 @@ export function EntrancePage() {
       </nav>
 
       <section className="portal-main">
-        <img
-          className="portal-mascot"
-          src={`${import.meta.env.BASE_URL}wasechan-mascot-v1.png`}
-          alt=""
-          aria-hidden="true"
-        />
         <img className="portal-logo" src={`${import.meta.env.BASE_URL}wasechan-logo-v3.png`} alt="わせチャン" />
         <p>早稲田大学非公式・科目別掲示板</p>
         <Link className="portal-enter" to="/boards">掲示板に入る</Link>

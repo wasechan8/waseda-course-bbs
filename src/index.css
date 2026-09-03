@@ -26,6 +26,10 @@
   --difficulty: #df7212;
   --mark-balance: #e6780a;
   --writing-balance: #2774b8;
+  --portal-background-desktop: none;
+  --portal-background-mobile: none;
+  --portal-background-desktop-opacity: 0.16;
+  --portal-background-mobile-opacity: 0.16;
   color-scheme: light;
 }
 
@@ -107,13 +111,16 @@ a:visited {
   text-align: center;
 }
 
-.portal-mascot {
+.portal-main::before {
+  content: "";
   position: absolute;
-  width: min(460px, 72vw);
-  height: auto;
-  opacity: 0.13;
+  inset: 0;
+  background-image: var(--portal-background-desktop);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: var(--portal-background-desktop-opacity);
   pointer-events: none;
-  transform: translateY(22px);
 }
 
 .portal-logo {
@@ -1649,6 +1656,133 @@ a:visited {
   white-space: nowrap;
 }
 
+.portal-background-admin {
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.portal-background-admin h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.portal-background-admin > p {
+  margin: 5px 0 10px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.background-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.background-control {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line-soft);
+  display: grid;
+  gap: 8px;
+}
+
+.background-control > strong {
+  font-size: 11px;
+}
+
+.background-preview {
+  height: 180px;
+  border: 1px solid #aaaaaa;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.background-preview img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.mobile-preview img {
+  width: min(112px, 42%);
+  border-inline: 1px solid #dddddd;
+}
+
+.background-file-actions,
+.background-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.file-picker-button,
+.background-file-actions button,
+.background-save-row button {
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 1px solid #999999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--subtle);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.file-picker-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.file-picker-button:focus-within {
+  outline: 2px solid var(--link);
+  outline-offset: 1px;
+}
+
+.opacity-control {
+  display: grid;
+  gap: 5px;
+  font-size: 10px;
+}
+
+.opacity-control span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.opacity-control output {
+  font-weight: 700;
+}
+
+.opacity-control input {
+  width: 100%;
+  accent-color: var(--link);
+  cursor: pointer;
+}
+
+.background-save-row {
+  margin-top: 10px;
+}
+
+.background-save-row small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
 .moderation-list > li {
   padding: 11px;
   border-bottom: 1px solid var(--line-soft);
@@ -1904,6 +2038,14 @@ a:visited {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .background-control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .background-preview {
+    height: 160px;
+  }
+
   .theme-save-row {
     align-items: stretch;
     flex-direction: column;
@@ -1913,8 +2055,9 @@ a:visited {
     justify-content: center;
   }
 
-  .portal-mascot {
-    width: min(380px, 88vw);
+  .portal-main::before {
+    background-image: var(--portal-background-mobile);
+    opacity: var(--portal-background-mobile-opacity);
   }
 
   .guide-page {

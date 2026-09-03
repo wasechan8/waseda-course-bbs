@@ -2,6 +2,7 @@ import { useEffect, type PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { applySiteTheme, DEFAULT_THEME_KEY, isThemeKey } from '../lib/siteTheme'
+import { applyPortalAppearance, normalizePortalAppearance } from '../lib/portalAppearance'
 
 export function AppShell({ children }: PropsWithChildren) {
   const { pathname } = useLocation()
@@ -11,19 +12,20 @@ export function AppShell({ children }: PropsWithChildren) {
     applySiteTheme(DEFAULT_THEME_KEY)
     if (!client) return
 
-    const loadTheme = async () => {
+    const loadAppearance = async () => {
       const { data } = await client
         .from('site_theme')
-        .select('theme_key')
+        .select('theme_key, desktop_background_path, mobile_background_path, desktop_background_opacity, mobile_background_opacity, updated_at')
         .eq('id', 'global')
         .maybeSingle()
       if (isThemeKey(data?.theme_key)) applySiteTheme(data.theme_key)
+      applyPortalAppearance(normalizePortalAppearance(data))
     }
 
-    void loadTheme()
+    void loadAppearance()
     const channel = client
       .channel('public-site-theme')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_theme' }, () => void loadTheme())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_theme' }, () => void loadAppearance())
       .subscribe()
     return () => {
       void client.removeChannel(channel)
