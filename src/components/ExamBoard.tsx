@@ -163,6 +163,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
       setTimeIntensity(0)
       setIncludeBalance(false)
       setShowForm(false)
+      setMessage('投稿ありがとうございます！')
       await loadReports()
     } catch (error) {
       setMessage(getErrorMessage(error, 'テスト情報を投稿できませんでした'))
