@@ -133,6 +133,13 @@ a:visited {
   height: auto;
 }
 
+.portal-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  line-height: 0;
+}
+
 .portal-main p {
   position: relative;
   z-index: 1;

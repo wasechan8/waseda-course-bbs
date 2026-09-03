@@ -53,7 +53,9 @@ export function EntrancePage() {
             <img src={desktopBackgroundUrl} alt="" />
           </picture>
         )}
-        <img className="portal-logo" src={`${import.meta.env.BASE_URL}wasechan-logo-v3.png`} alt="わせチャン" />
+        <h1 className="portal-title">
+          <img className="portal-logo" src={`${import.meta.env.BASE_URL}wasechan-logo-v3.png`} alt="わせチャン" />
+        </h1>
         <p>早稲田大学非公式・科目別掲示板</p>
         <Link className="portal-enter" to="/boards">掲示板に入る</Link>
         <RecentPostsFeed />

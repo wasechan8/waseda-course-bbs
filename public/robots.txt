@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wasechan8.github.io/waseda-course-bbs/sitemap.xml
