@@ -26,6 +26,7 @@ const BASE_REPORT_COLUMNS = 'id,course_id,anon_label,rating,body,taken_year,take
 const REPORT_COLUMNS = `${BASE_REPORT_COLUMNS},report_format,report_word_count,report_details`
 const ALL_REPORT_COLUMNS = `${REPORT_COLUMNS},credit_rating,grade_rating,interest_rating,workload_rating`
 const EXTENDED_REPORT_COLUMNS = `${ALL_REPORT_COLUMNS},attendance_method,attendance_notes,report_items`
+const HELPFUL_REPORT_COLUMNS = `${EXTENDED_REPORT_COLUMNS},helpful_count`
 const RATING_FIELDS = [
   { key: 'credit_rating', label: '単位' },
   { key: 'grade_rating', label: '成績' },
@@ -63,6 +64,10 @@ function isMissingExtendedReportColumn(error: { message?: string } | null) {
   )
 }
 
+function isMissingHelpfulColumn(error: { message?: string } | null) {
+  return Boolean(error?.message?.includes('exam_reports.helpful_count'))
+}
+
 function getRating(report: ExamReport, key: RatingKey) {
   return Number(report[key] ?? report.rating)
 }
@@ -86,7 +91,7 @@ function StarRating({ value, label }: { value: number; label?: string }) {
   )
 }
 
-function StarRatingInput({
+function RatingNumberInput({
   label,
   value,
   onChange,
@@ -98,27 +103,63 @@ function StarRatingInput({
   return (
     <div className="review-rating-field">
       <span>{label}</span>
-      <div className="star-rating-input">
+      <div className="number-rating-input" role="group" aria-label={`${label}の評価`}>
         {[1, 2, 3, 4, 5].map((score) => (
           <button
             type="button"
             key={score}
-            className={score <= value ? 'selected' : ''}
+            className={score === value ? 'selected' : ''}
             onClick={() => onChange(score)}
             aria-label={`${label} ${score}`}
+            aria-pressed={score === value}
           >
-            <span
-              className="star-symbol"
-              style={{ '--star-fill': score <= value ? '100%' : '0%' } as CSSProperties}
-              aria-hidden="true"
-            >
-              <Star className="star-outline" />
-              <span className="star-fill"><Star fill="currentColor" /></span>
-            </span>
+            {score}
           </button>
         ))}
       </div>
     </div>
+  )
+}
+
+function RatingRadar({ report }: { report: ExamReport }) {
+  const ratings = RATING_FIELDS.map(({ key }) => Math.max(0, Math.min(5, getRating(report, key))))
+  const center = 100
+  const radius = 62
+  const point = (axis: number, value: number) => {
+    const distance = radius * value / 5
+    if (axis === 0) return `${center},${center - distance}`
+    if (axis === 1) return `${center + distance},${center}`
+    if (axis === 2) return `${center},${center + distance}`
+    return `${center - distance},${center}`
+  }
+  const polygon = ratings.map((value, axis) => point(axis, value)).join(' ')
+  const description = RATING_FIELDS
+    .map(({ label }, index) => `${label}${ratings[index]}`)
+    .join('、')
+
+  return (
+    <figure className="rating-radar" aria-label={`評価の内訳。${description}`}>
+      <svg viewBox="0 0 240 220" role="img" aria-hidden="true">
+        <g className="radar-grid">
+          {[1, 2, 3, 4, 5].map((level) => {
+            const distance = radius * level / 5
+            return (
+              <polygon
+                key={level}
+                points={`${center},${center - distance} ${center + distance},${center} ${center},${center + distance} ${center - distance},${center}`}
+              />
+            )
+          })}
+          <line x1="100" y1="38" x2="100" y2="162" />
+          <line x1="38" y1="100" x2="162" y2="100" />
+        </g>
+        <polygon className="radar-value" points={polygon} />
+        <text x="100" y="20" textAnchor="middle">単位 {ratings[0]}</text>
+        <text x="174" y="104" textAnchor="start">成績 {ratings[1]}</text>
+        <text x="100" y="190" textAnchor="middle">面白さ {ratings[2]}</text>
+        <text x="26" y="104" textAnchor="end">負担 {ratings[3]}</text>
+      </svg>
+    </figure>
   )
 }
 
@@ -194,6 +235,9 @@ export function ExamBoard({
   const [reportFieldsAvailable, setReportFieldsAvailable] = useState(true)
   const [ratingFieldsAvailable, setRatingFieldsAvailable] = useState(true)
   const [extendedFieldsAvailable, setExtendedFieldsAvailable] = useState(true)
+  const [helpfulFeatureAvailable, setHelpfulFeatureAvailable] = useState(true)
+  const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({})
+  const [busyHelpfulId, setBusyHelpfulId] = useState<string | null>(null)
   const [yearFilter, setYearFilter] = useState<number | 'all'>('all')
 
   const [ratings, setRatings] = useState<RatingValues>(EMPTY_RATINGS)
@@ -227,12 +271,24 @@ export function ExamBoard({
     setLoading(true)
     try {
       await ensureAnonymousSession()
+      let hasHelpfulFeature = true
       let result: { data: Record<string, unknown>[] | null; error: { message: string } | null } = await supabase
         .from('exam_reports')
-        .select(EXTENDED_REPORT_COLUMNS)
+        .select(HELPFUL_REPORT_COLUMNS)
         .in('course_id', reviewCourseIds)
         .order('created_at', { ascending: false })
         .limit(100)
+
+      if (isMissingHelpfulColumn(result.error)) {
+        hasHelpfulFeature = false
+        result = await supabase
+          .from('exam_reports')
+          .select(EXTENDED_REPORT_COLUMNS)
+          .in('course_id', reviewCourseIds)
+          .order('created_at', { ascending: false })
+          .limit(100)
+      }
+      setHelpfulFeatureAvailable(hasHelpfulFeature)
 
       if (isMissingExtendedReportColumn(result.error)) {
         setExtendedFieldsAvailable(false)
@@ -266,6 +322,7 @@ export function ExamBoard({
           attendance_method: null,
           attendance_notes: null,
           report_items: null,
+          helpful_count: 0,
         })) as ExamReport[])
         return
       }
@@ -293,6 +350,7 @@ export function ExamBoard({
           attendance_method: null,
           attendance_notes: null,
           report_items: null,
+          helpful_count: 0,
         })) as ExamReport[])
         return
       }
@@ -300,12 +358,25 @@ export function ExamBoard({
       if (result.error) throw result.error
       setReportFieldsAvailable(true)
       setRatingFieldsAvailable(true)
-      setReports((result.data ?? []).map((report) => ({
+      const loadedReports = (result.data ?? []).map((report) => ({
         ...report,
         attendance_method: 'attendance_method' in report ? report.attendance_method : null,
         attendance_notes: 'attendance_notes' in report ? report.attendance_notes : null,
         report_items: 'report_items' in report ? report.report_items : null,
-      })) as ExamReport[])
+        helpful_count: 'helpful_count' in report ? Number(report.helpful_count) : 0,
+      })) as ExamReport[]
+      setReports(loadedReports)
+
+      if (hasHelpfulFeature && loadedReports.length > 0) {
+        const voteResult = await supabase
+          .from('exam_report_helpful_votes')
+          .select('report_id')
+          .in('report_id', loadedReports.map((report) => report.id))
+        if (voteResult.error) throw voteResult.error
+        setHelpfulVotes(Object.fromEntries((voteResult.data ?? []).map((vote) => [vote.report_id, true])))
+      } else {
+        setHelpfulVotes({})
+      }
     } catch (error) {
       setMessage(getErrorMessage(error, '口コミを読み込めませんでした'))
     } finally {
@@ -446,6 +517,29 @@ export function ExamBoard({
     }
   }
 
+  async function toggleHelpful(reportId: string) {
+    if (!supabase || !helpfulFeatureAvailable || busyHelpfulId) return
+    const wasHelpful = Boolean(helpfulVotes[reportId])
+    setBusyHelpfulId(reportId)
+    setMessage(null)
+    try {
+      await ensureAnonymousSession()
+      const result = wasHelpful
+        ? await supabase.from('exam_report_helpful_votes').delete().eq('report_id', reportId)
+        : await supabase.from('exam_report_helpful_votes').insert({ report_id: reportId })
+      if (result.error) throw result.error
+
+      setHelpfulVotes((current) => ({ ...current, [reportId]: !wasHelpful }))
+      setReports((current) => current.map((report) => report.id === reportId
+        ? { ...report, helpful_count: Math.max(0, report.helpful_count + (wasHelpful ? -1 : 1)) }
+        : report))
+    } catch (error) {
+      setMessage(getErrorMessage(error, '参考になったを記録できませんでした'))
+    } finally {
+      setBusyHelpfulId(null)
+    }
+  }
+
   if (!isSupabaseConfigured) {
     return <StatusNotice setup>口コミは準備中です。Supabase接続後に投稿できます。</StatusNotice>
   }
@@ -478,7 +572,7 @@ export function ExamBoard({
             <label>評価（必須）</label>
             <div className="review-rating-grid">
               {RATING_FIELDS.map(({ key, label }) => (
-                <StarRatingInput
+                <RatingNumberInput
                   key={key}
                   label={label}
                   value={ratings[key]}
@@ -696,59 +790,76 @@ export function ExamBoard({
               {report.course_id !== courseId && (
                 <p className="transferred-review-note">この口コミは別学期開講の同コード授業から転送されています。</p>
               )}
-              <div className="review-rating-breakdown">
-                {RATING_FIELDS.map(({ key, label }) => (
-                  <span key={key}><b>{label}</b><StarRating value={getRating(report, key)} label={label} /></span>
-                ))}
-              </div>
-              <p>{report.body}</p>
-              {(report.attendance_method || report.attendance_notes) && (
-                <div className="review-extra compact">
-                  <strong>出席</strong>
-                  <dl className="exam-facts">
-                    {report.attendance_method && <div><dt>確認方法</dt><dd>{report.attendance_method}</dd></div>}
-                  </dl>
-                  {report.attendance_notes && <p className="report-details">{report.attendance_notes}</p>}
-                </div>
-              )}
-              {(report.exam_format || report.bring_in || report.exam_minutes != null || report.difficulty != null || report.time_intensity != null || report.mark_writing_balance != null) && (
-                <div className="review-extra">
-                  <strong>テスト</strong>
-                  <dl className="exam-facts">
-                    {report.exam_format && <div><dt>形式</dt><dd>{report.exam_format}</dd></div>}
-                    {report.bring_in && <div><dt>持込</dt><dd>{report.bring_in}</dd></div>}
-                    {report.exam_minutes != null && <div><dt>時間</dt><dd>{report.exam_minutes}分</dd></div>}
-                    {report.difficulty != null && <div><dt>難易度</dt><dd><ScoreDisplay value={report.difficulty} tone="difficulty" /></dd></div>}
-                    {report.time_intensity != null && <div><dt>時間のキツさ</dt><dd><ScoreDisplay value={report.time_intensity} tone="intensity" /></dd></div>}
-                  </dl>
-                  {report.mark_writing_balance != null && (
-                    <div className="balance-display">
-                      <div className="balance-labels">
-                        <span className="mark-label">マーク {report.mark_writing_balance}%</span>
-                        <span className="writing-label">記述 {100 - report.mark_writing_balance}%</span>
-                      </div>
-                      <div className="balance-track">
-                        <span className="mark-balance" style={{ width: `${report.mark_writing_balance}%` }} />
-                        <span className="writing-balance" style={{ width: `${100 - report.mark_writing_balance}%` }} />
+              <div className="review-content">
+                <div className="review-copy">
+                  <p className="review-body">{report.body}</p>
+                  {(report.attendance_method || report.attendance_notes) && (
+                    <div className="review-extra compact">
+                      <strong>出席</strong>
+                      <dl className="exam-facts">
+                        {report.attendance_method && <div><dt>確認方法</dt><dd>{report.attendance_method}</dd></div>}
+                      </dl>
+                      {report.attendance_notes && <p className="report-details">{report.attendance_notes}</p>}
+                    </div>
+                  )}
+                  {(report.exam_format || report.bring_in || report.exam_minutes != null || report.difficulty != null || report.time_intensity != null || report.mark_writing_balance != null) && (
+                    <div className="review-extra">
+                      <strong>テスト</strong>
+                      <dl className="exam-facts">
+                        {report.exam_format && <div><dt>形式</dt><dd>{report.exam_format}</dd></div>}
+                        {report.bring_in && <div><dt>持込</dt><dd>{report.bring_in}</dd></div>}
+                        {report.exam_minutes != null && <div><dt>時間</dt><dd>{report.exam_minutes}分</dd></div>}
+                        {report.difficulty != null && <div><dt>難易度</dt><dd><ScoreDisplay value={report.difficulty} tone="difficulty" /></dd></div>}
+                        {report.time_intensity != null && <div><dt>時間のキツさ</dt><dd><ScoreDisplay value={report.time_intensity} tone="intensity" /></dd></div>}
+                      </dl>
+                      {report.mark_writing_balance != null && (
+                        <div className="balance-display">
+                          <div className="balance-labels">
+                            <span className="mark-label">マーク {report.mark_writing_balance}%</span>
+                            <span className="writing-label">記述 {100 - report.mark_writing_balance}%</span>
+                          </div>
+                          <div className="balance-track">
+                            <span className="mark-balance" style={{ width: `${report.mark_writing_balance}%` }} />
+                            <span className="writing-balance" style={{ width: `${100 - report.mark_writing_balance}%` }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {getReportItems(report).length > 0 && (
+                    <div className="review-extra">
+                      <strong>レポート</strong>
+                      <div className="report-items">
+                        {getReportItems(report).map((item, reportIndex) => (
+                          <div className="report-item" key={`${report.id}-report-${reportIndex}`}>
+                            <dl className="exam-facts">
+                              {item.type && <div><dt>種類</dt><dd>{item.type}</dd></div>}
+                              {item.word_count != null && <div><dt>分量</dt><dd>約{item.word_count.toLocaleString()}字</dd></div>}
+                            </dl>
+                            {item.details && <p className="report-details">{item.details}</p>}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
                 </div>
-              )}
-              {getReportItems(report).length > 0 && (
-                <div className="review-extra">
-                  <strong>レポート</strong>
-                  <div className="report-items">
-                    {getReportItems(report).map((item, index) => (
-                      <div className="report-item" key={`${report.id}-report-${index}`}>
-                        <dl className="exam-facts">
-                          {item.type && <div><dt>種類</dt><dd>{item.type}</dd></div>}
-                          {item.word_count != null && <div><dt>分量</dt><dd>約{item.word_count.toLocaleString()}字</dd></div>}
-                        </dl>
-                        {item.details && <p className="report-details">{item.details}</p>}
-                      </div>
-                    ))}
-                  </div>
+                <RatingRadar report={report} />
+              </div>
+              {helpfulFeatureAvailable && (
+                <div className="review-helpful">
+                  {report.helpful_count > 0 && (
+                    <p>{report.helpful_count}人が参考になったと感じています</p>
+                  )}
+                  <button
+                    type="button"
+                    className={helpfulVotes[report.id] ? 'helpful-button selected' : 'helpful-button'}
+                    aria-pressed={Boolean(helpfulVotes[report.id])}
+                    aria-label={helpfulVotes[report.id] ? '参考になったを取り消す' : '参考になった'}
+                    disabled={busyHelpfulId === report.id}
+                    onClick={() => void toggleHelpful(report.id)}
+                  >
+                    参考になった
+                  </button>
                 </div>
               )}
               <div className="exam-footer">

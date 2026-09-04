@@ -41,6 +41,7 @@ export type ExamReport = {
   attendance_method: string | null
   attendance_notes: string | null
   report_items: ReportItem[] | null
+  helpful_count: number
   created_at: string
 }
 
