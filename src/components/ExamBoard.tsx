@@ -356,20 +356,6 @@ export function ExamBoard({ courseId }: { courseId: string }) {
 
       {showForm && (
         <form className="exam-form" onSubmit={submitReport}>
-          <div className="form-section">
-            <label>評価（必須）</label>
-            <div className="review-rating-grid">
-              {RATING_FIELDS.map(({ key, label }) => (
-                <SmileRatingInput
-                  key={key}
-                  label={label}
-                  value={ratings[key]}
-                  onChange={(value) => setRatings((current) => ({ ...current, [key]: value }))}
-                />
-              ))}
-            </div>
-          </div>
-
           <div className="form-grid two-columns">
             <label>
               履修年度
@@ -383,6 +369,20 @@ export function ExamBoard({ courseId }: { courseId: string }) {
                 {TERMS.map((term) => <option key={term}>{term}</option>)}
               </select>
             </label>
+          </div>
+
+          <div className="form-section">
+            <label>評価（必須）</label>
+            <div className="review-rating-grid">
+              {RATING_FIELDS.map(({ key, label }) => (
+                <SmileRatingInput
+                  key={key}
+                  label={label}
+                  value={ratings[key]}
+                  onChange={(value) => setRatings((current) => ({ ...current, [key]: value }))}
+                />
+              ))}
+            </div>
           </div>
 
           <label>
