@@ -16,6 +16,10 @@ export type ExamReport = {
   course_id: string
   anon_label: string
   rating: number
+  credit_rating: number | null
+  grade_rating: number | null
+  interest_rating: number | null
+  workload_rating: number | null
   body: string
   taken_year: number
   taken_term: string
@@ -25,6 +29,9 @@ export type ExamReport = {
   difficulty: number | null
   time_intensity: number | null
   mark_writing_balance: number | null
+  report_format: string | null
+  report_word_count: number | null
+  report_details: string | null
   created_at: string
 }
 

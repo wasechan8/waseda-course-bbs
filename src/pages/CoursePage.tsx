@@ -121,7 +121,7 @@ export function CoursePage() {
           className={activeTab === 'exam' ? 'active' : ''}
           onClick={() => setActiveTab('exam')}
         >
-          テスト情報
+          口コミ
         </button>
       </div>
 

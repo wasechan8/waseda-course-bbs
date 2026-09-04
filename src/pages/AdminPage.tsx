@@ -437,7 +437,7 @@ export function AdminPage() {
             {queue.map((item) => (
               <li key={`${item.content_type}:${item.content_id}`}>
                 <div className="moderation-meta">
-                  <strong>{item.content_type === 'bbs' ? '掲示板投稿' : 'テスト情報'}</strong>
+                  <strong>{item.content_type === 'bbs' ? '掲示板投稿' : '口コミ'}</strong>
                   <span>{item.status}</span>
                   <span>{item.report_count}件の通報</span>
                   <time>{new Date(item.created_at).toLocaleString('ja-JP')}</time>

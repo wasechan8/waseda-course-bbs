@@ -53,7 +53,7 @@ export function DirectoryPage() {
     <div className="entrance-page">
       <section className="entrance-heading">
         <h1>早稲田大学 科目別掲示板</h1>
-        <p>学部を選ぶと、科目ごとの掲示板とテスト情報を見られます。</p>
+        <p>学部を選ぶと、科目ごとの掲示板と口コミを見られます。</p>
       </section>
 
       <form className="entrance-search" onSubmit={searchCourses}>

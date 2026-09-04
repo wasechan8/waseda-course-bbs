@@ -1081,7 +1081,7 @@ a:visited {
   padding: 10px 12px;
   border: 1px solid var(--line);
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 14px;
   background: var(--surface);
@@ -1103,10 +1103,122 @@ a:visited {
   font-size: 25px;
 }
 
-.stars {
+.review-average {
   display: flex;
-  gap: 1px;
-  color: var(--star);
+  align-items: center;
+  gap: 8px;
+}
+
+.review-average strong {
+  min-width: 58px;
+  font-variant-numeric: tabular-nums;
+}
+
+.review-average .smile-rating {
+  font-size: 25px;
+}
+
+.review-average.small {
+  gap: 6px;
+}
+
+.review-average.small strong {
+  min-width: 42px;
+  font-size: 14px;
+}
+
+.review-average.small .smile-rating {
+  font-size: 16px;
+}
+
+.review-rating-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  gap: 5px 14px;
+}
+
+.review-rating-breakdown > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #555555;
+  font-size: 10px;
+}
+
+.review-rating-breakdown b {
+  min-width: 46px;
+  color: #333333;
+  font-weight: 700;
+}
+
+.smile-rating,
+.smile-rating-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.smile-symbol {
+  --smile-fill: 0%;
+  position: relative;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  font-size: 1em;
+  line-height: 1;
+  -webkit-text-stroke: 1px #999999;
+}
+
+.smile-symbol::after {
+  position: absolute;
+  inset: 0;
+  width: var(--smile-fill);
+  overflow: hidden;
+  color: #777777;
+  content: '☻';
+  -webkit-text-stroke: 0;
+}
+
+.review-rating-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+}
+
+.review-rating-field {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.review-rating-field > span {
+  color: #333333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.smile-rating-input button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  font-size: 25px;
+}
+
+.smile-rating-input button:hover .smile-symbol,
+.smile-rating-input button:focus-visible .smile-symbol {
+  transform: scale(1.08);
+}
+
+.review-rating-breakdown {
+  margin: 8px 0 10px;
 }
 
 .exam-form {
@@ -1126,14 +1238,12 @@ a:visited {
   font-weight: 700;
 }
 
-.rating-input,
 .diamond-score {
   display: flex;
   align-items: center;
   gap: 2px;
 }
 
-.rating-input button,
 .diamond-score button {
   width: 30px;
   height: 30px;
@@ -1144,9 +1254,6 @@ a:visited {
   background: transparent;
 }
 
-.rating-input button {
-  color: var(--star);
-}
 
 .form-grid {
   display: grid;
@@ -1220,6 +1327,95 @@ a:visited {
   padding: 12px;
   border: 1px solid var(--line-soft);
   background: var(--surface);
+}
+
+.optional-info-section {
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+}
+
+.optional-info-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.optional-info-heading strong {
+  font-size: 12px;
+}
+
+.optional-info-heading span {
+  color: #777777;
+  font-size: 10px;
+}
+
+.optional-info-switches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.optional-info-switches.single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 50%;
+}
+
+.optional-info-switch {
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 1px solid #aaaaaa;
+  display: grid !important;
+  grid-template-columns: 17px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px !important;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.optional-info-switch:hover {
+  border-color: #666666;
+}
+
+.optional-info-switch.selected {
+  border-color: var(--accent);
+  background: var(--subtle);
+}
+
+.optional-info-switch input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.optional-info-switch > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.optional-info-switch strong {
+  color: #222222;
+  font-size: 13px;
+}
+
+.optional-info-switch small {
+  color: #777777;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.optional-info-section-title {
+  color: #444444;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.optional-info-fields {
+  margin-top: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
 }
 
 .check-label {
@@ -1358,6 +1554,26 @@ a:visited {
 
 .exam-facts dd {
   margin: 0;
+}
+
+.review-extra {
+  margin-top: 10px;
+  padding: 9px 0 0;
+  border-top: 1px dotted var(--line-soft);
+}
+
+.review-extra > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #555555;
+  font-size: 12px;
+}
+
+.report-details {
+  margin: 7px 0 0;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .balance-display {
