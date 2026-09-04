@@ -2,23 +2,13 @@ import { Diamond, Flag, Send, Star } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
 import { ensureAnonymousSession, isSupabaseConfigured, supabase } from '../lib/supabase'
 import { getErrorMessage } from '../lib/errors'
+import type { Course } from '../types/catalog'
 import type { ExamReport } from '../types/community'
 import { StatusNotice } from './StatusNotice'
 import { PostingPolicyNotice } from './PostingPolicyNotice'
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: 10 }, (_, index) => CURRENT_YEAR - index)
-const TERMS = [
-  '春学期',
-  '秋学期',
-  '通年',
-  '春クォーター',
-  '夏クォーター',
-  '秋クォーター',
-  '冬クォーター',
-  '夏季集中',
-  '冬季集中',
-]
 const EXAM_FORMATS = ['筆記', 'オンライン', 'プレゼン', 'その他']
 const BRING_IN_OPTIONS = ['不可', '一部可', '全可']
 const ATTENDANCE_METHODS = [
@@ -187,7 +177,15 @@ function ScoreDisplay({ value, tone }: { value: number; tone: 'difficulty' | 'in
   )
 }
 
-export function ExamBoard({ courseId }: { courseId: string }) {
+export function ExamBoard({
+  courseId,
+  courseTerm,
+  reviewCourses,
+}: {
+  courseId: string
+  courseTerm: string | null
+  reviewCourses: Array<Pick<Course, 'id' | 'term'>>
+}) {
   const [reports, setReports] = useState<ExamReport[]>([])
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(isSupabaseConfigured)
@@ -201,7 +199,6 @@ export function ExamBoard({ courseId }: { courseId: string }) {
   const [ratings, setRatings] = useState<RatingValues>(EMPTY_RATINGS)
   const [body, setBody] = useState('')
   const [takenYear, setTakenYear] = useState(CURRENT_YEAR)
-  const [takenTerm, setTakenTerm] = useState('春学期')
   const [includeExam, setIncludeExam] = useState(false)
   const [examFormat, setExamFormat] = useState('')
   const [bringIn, setBringIn] = useState('')
@@ -216,6 +213,14 @@ export function ExamBoard({ courseId }: { courseId: string }) {
   const [reportDrafts, setReportDrafts] = useState<ReportDraft[]>([
     { id: 1, type: '期末レポート', wordCount: '', details: '' },
   ])
+  const reviewCourseIds = useMemo(
+    () => reviewCourses.length > 0 ? reviewCourses.map((course) => course.id) : [courseId],
+    [courseId, reviewCourses],
+  )
+  const reviewCourseTerms = useMemo(
+    () => new Map(reviewCourses.map((course) => [course.id, course.term])),
+    [reviewCourses],
+  )
 
   const loadReports = useCallback(async () => {
     if (!supabase) return
@@ -225,7 +230,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
       let result: { data: Record<string, unknown>[] | null; error: { message: string } | null } = await supabase
         .from('exam_reports')
         .select(EXTENDED_REPORT_COLUMNS)
-        .eq('course_id', courseId)
+        .in('course_id', reviewCourseIds)
         .order('created_at', { ascending: false })
         .limit(100)
 
@@ -234,7 +239,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
         result = await supabase
           .from('exam_reports')
           .select(ALL_REPORT_COLUMNS)
-          .eq('course_id', courseId)
+          .in('course_id', reviewCourseIds)
           .order('created_at', { ascending: false })
           .limit(100)
       } else {
@@ -245,7 +250,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
         const fallback = await supabase
           .from('exam_reports')
           .select(REPORT_COLUMNS)
-          .eq('course_id', courseId)
+          .in('course_id', reviewCourseIds)
           .order('created_at', { ascending: false })
           .limit(100)
         if (fallback.error) throw fallback.error
@@ -269,7 +274,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
         const fallback = await supabase
           .from('exam_reports')
           .select(BASE_REPORT_COLUMNS)
-          .eq('course_id', courseId)
+          .in('course_id', reviewCourseIds)
           .order('created_at', { ascending: false })
           .limit(100)
         if (fallback.error) throw fallback.error
@@ -306,7 +311,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
     } finally {
       setLoading(false)
     }
-  }, [courseId])
+  }, [reviewCourseIds])
 
   useEffect(() => {
     void loadReports()
@@ -379,7 +384,7 @@ export function ExamBoard({ courseId }: { courseId: string }) {
         ...(ratingFieldsAvailable ? ratings : {}),
         body: body.trim(),
         taken_year: takenYear,
-        taken_term: takenTerm,
+        taken_term: courseTerm || '未登録',
         exam_format: includeExam ? examFormat || null : null,
         bring_in: includeExam ? bringIn || null : null,
         exam_minutes: includeExam && examMinutes ? Number(examMinutes) : null,
@@ -460,17 +465,11 @@ export function ExamBoard({ courseId }: { courseId: string }) {
 
       {showForm && (
         <form className="exam-form" onSubmit={submitReport}>
-          <div className="form-grid two-columns">
+          <div className="form-grid">
             <label>
               履修年度
               <select value={takenYear} onChange={(event) => setTakenYear(Number(event.target.value))}>
                 {YEARS.map((year) => <option key={year}>{year}</option>)}
-              </select>
-            </label>
-            <label>
-              学期
-              <select value={takenTerm} onChange={(event) => setTakenTerm(event.target.value)}>
-                {TERMS.map((term) => <option key={term}>{term}</option>)}
               </select>
             </label>
           </div>
@@ -687,8 +686,16 @@ export function ExamBoard({ courseId }: { courseId: string }) {
                   <StarRating value={Number(report.rating)} />
                   <strong>{Number(report.rating).toFixed(2)}</strong>
                 </div>
-                <span>{report.taken_year}年度 {report.taken_term}</span>
+                <span>
+                  {report.taken_year}年度
+                  {report.course_id !== courseId && reviewCourseTerms.get(report.course_id)
+                    ? ` ${reviewCourseTerms.get(report.course_id)}`
+                    : ''}
+                </span>
               </div>
+              {report.course_id !== courseId && (
+                <p className="transferred-review-note">この口コミは別学期開講の同コード授業から転送されています。</p>
+              )}
               <div className="review-rating-breakdown">
                 {RATING_FIELDS.map(({ key, label }) => (
                   <span key={key}><b>{label}</b><StarRating value={getRating(report, key)} label={label} /></span>

@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { BbsBoard } from '../components/BbsBoard'
 import { ExamBoard } from '../components/ExamBoard'
 import { StatusNotice } from '../components/StatusNotice'
-import { getCourses } from '../lib/catalog'
+import { getCourses, getReviewCourses } from '../lib/catalog'
 import { getCampusForFaculty } from '../lib/campuses'
 import type { Course } from '../types/catalog'
 import { isFavoriteCourse, rememberCourse, toggleFavoriteCourse } from '../lib/courseActivity'
@@ -14,6 +14,7 @@ type DetailTab = 'bbs' | 'exam'
 export function CoursePage() {
   const { facultySlug = '', courseId = '' } = useParams()
   const [course, setCourse] = useState<Course | null>(null)
+  const [reviewCourses, setReviewCourses] = useState<Course[]>([])
   const [activeTab, setActiveTab] = useState<DetailTab>('bbs')
   const [error, setError] = useState<string | null>(null)
   const [favorite, setFavorite] = useState(false)
@@ -26,6 +27,7 @@ export function CoursePage() {
         const found = courses.find((item) => item.id === courseId)
         if (!found) throw new Error('科目が見つかりませんでした')
         setCourse(found)
+        setReviewCourses(getReviewCourses(courses, found))
         setFavorite(isFavoriteCourse(found.id))
         rememberCourse(found)
       })
@@ -125,7 +127,9 @@ export function CoursePage() {
         </button>
       </div>
 
-      {activeTab === 'bbs' ? <BbsBoard courseId={course.id} /> : <ExamBoard courseId={course.id} />}
+      {activeTab === 'bbs'
+        ? <BbsBoard courseId={course.id} />
+        : <ExamBoard courseId={course.id} courseTerm={course.term} reviewCourses={reviewCourses} />}
     </div>
   )
 }

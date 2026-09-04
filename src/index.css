@@ -1151,6 +1151,14 @@ a:visited {
   font-weight: 700;
 }
 
+.transferred-review-note {
+  margin: 8px 0 10px;
+  padding-left: 8px;
+  border-left: 2px solid #aaaaaa;
+  color: #666666;
+  font-size: 12px;
+}
+
 .star-rating,
 .star-rating-input {
   --star-size: 25px;
