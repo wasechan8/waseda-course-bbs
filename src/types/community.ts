@@ -11,6 +11,12 @@ export type BbsPost = {
   created_at: string
 }
 
+export type ReportItem = {
+  type: string
+  word_count: number | null
+  details: string | null
+}
+
 export type ExamReport = {
   id: string
   course_id: string
@@ -32,6 +38,9 @@ export type ExamReport = {
   report_format: string | null
   report_word_count: number | null
   report_details: string | null
+  attendance_method: string | null
+  attendance_notes: string | null
+  report_items: ReportItem[] | null
   created_at: string
 }
 

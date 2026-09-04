@@ -1114,8 +1114,8 @@ a:visited {
   font-variant-numeric: tabular-nums;
 }
 
-.review-average .smile-rating {
-  font-size: 25px;
+.review-average .star-rating {
+  --star-size: 27px;
 }
 
 .review-average.small {
@@ -1127,8 +1127,8 @@ a:visited {
   font-size: 14px;
 }
 
-.review-average.small .smile-rating {
-  font-size: 16px;
+.review-average.small .star-rating {
+  --star-size: 17px;
 }
 
 .review-rating-breakdown {
@@ -1151,35 +1151,46 @@ a:visited {
   font-weight: 700;
 }
 
-.smile-rating,
-.smile-rating-input {
+.star-rating,
+.star-rating-input {
+  --star-size: 25px;
   display: inline-flex;
   align-items: center;
   gap: 2px;
 }
 
-.smile-symbol {
-  --smile-fill: 0%;
+.star-symbol {
+  --star-fill: 0%;
   position: relative;
-  width: 1em;
-  height: 1em;
+  width: var(--star-size);
+  height: var(--star-size);
   display: inline-block;
-  overflow: hidden;
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-  font-size: 1em;
-  line-height: 1;
-  -webkit-text-stroke: 1px #999999;
+  flex: 0 0 var(--star-size);
+  color: #777777;
 }
 
-.smile-symbol::after {
+.star-symbol svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.45;
+}
+
+.star-outline {
+  color: #a3a3a3;
+}
+
+.star-fill {
   position: absolute;
   inset: 0;
-  width: var(--smile-fill);
+  width: var(--star-fill);
   overflow: hidden;
-  color: #777777;
-  content: '☻';
-  -webkit-text-stroke: 0;
+  color: #747474;
+}
+
+.star-fill svg {
+  width: var(--star-size);
+  max-width: none;
+  color: inherit;
 }
 
 .review-rating-grid {
@@ -1201,7 +1212,7 @@ a:visited {
   font-weight: 700;
 }
 
-.smile-rating-input button {
+.star-rating-input button {
   width: 30px;
   height: 30px;
   padding: 0;
@@ -1209,11 +1220,10 @@ a:visited {
   display: grid;
   place-items: center;
   background: transparent;
-  font-size: 25px;
 }
 
-.smile-rating-input button:hover .smile-symbol,
-.smile-rating-input button:focus-visible .smile-symbol {
+.star-rating-input button:hover .star-symbol,
+.star-rating-input button:focus-visible .star-symbol {
   transform: scale(1.08);
 }
 
@@ -1350,6 +1360,15 @@ a:visited {
   font-size: 10px;
 }
 
+.attendance-fields {
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  background: var(--surface);
+}
+
 .optional-info-switches {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1416,6 +1435,60 @@ a:visited {
   display: flex;
   flex-direction: column;
   gap: 13px;
+}
+
+.report-draft {
+  padding-bottom: 13px;
+  border-bottom: 1px dotted #aaaaaa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-draft:last-of-type {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.report-draft-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #444444;
+  font-size: 11px;
+}
+
+.report-draft-heading button,
+.add-report-button {
+  min-height: 30px;
+  border: 1px solid #999999;
+  background: #ffffff;
+  color: #444444;
+}
+
+.report-draft-heading button {
+  padding: 3px 10px;
+}
+
+.add-report-button {
+  align-self: flex-start;
+  padding: 5px 12px;
+}
+
+.report-items {
+  margin-top: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.report-item + .report-item {
+  padding-top: 9px;
+  border-top: 1px dotted #aaaaaa;
+}
+
+.review-extra.compact .exam-facts {
+  margin-top: 6px;
 }
 
 .check-label {
@@ -2222,15 +2295,23 @@ a:visited {
     font-size: 13px;
   }
 
-  .smile-rating-input {
+  .star-rating-input {
     justify-content: flex-start;
     min-width: 0;
   }
 
-  .smile-rating-input button {
+  .star-rating-input button {
     width: 32px;
     height: 32px;
     flex: 0 0 32px;
+  }
+
+  .star-rating-input .star-symbol {
+    --star-size: 27px;
+  }
+
+  .attendance-fields {
+    grid-template-columns: 1fr;
   }
 
   .two-columns,
