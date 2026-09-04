@@ -2208,6 +2208,31 @@ a:visited {
     width: 100%;
   }
 
+  .review-rating-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .review-rating-field {
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .review-rating-field > span {
+    font-size: 13px;
+  }
+
+  .smile-rating-input {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .smile-rating-input button {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
   .two-columns,
   .three-columns {
     grid-template-columns: 1fr;
