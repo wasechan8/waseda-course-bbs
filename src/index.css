@@ -2286,6 +2286,28 @@ a:visited {
     gap: 8px;
   }
 
+  .review-rating-breakdown {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .review-rating-breakdown > span {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .review-rating-breakdown b {
+    min-width: 0;
+  }
+
+  .review-rating-breakdown .star-rating {
+    --star-size: 24px;
+    min-width: 0;
+  }
+
   .review-rating-field {
     grid-template-columns: 78px minmax(0, 1fr);
     gap: 6px;
