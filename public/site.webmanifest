@@ -1,0 +1,17 @@
+{
+  "name": "わせチャン",
+  "short_name": "わせチャン",
+  "description": "早稲田大学非公式・科目別掲示板",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8f1537",
+  "icons": [
+    {
+      "src": "./wasechan-mascot-v1.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
