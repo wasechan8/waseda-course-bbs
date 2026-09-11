@@ -8,14 +8,16 @@ import { ensureAnonymousSession, isSupabaseConfigured, supabase } from '../lib/s
 import type { LoungeThread } from '../types/community'
 import { PostingPolicyNotice } from '../components/PostingPolicyNotice'
 
+const THREAD_DATE_FORMATTER = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value))
+  return THREAD_DATE_FORMATTER.format(new Date(value))
 }
 
 export function LoungePage() {

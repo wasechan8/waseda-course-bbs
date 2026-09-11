@@ -15,16 +15,18 @@ import { PostingPolicyNotice } from './PostingPolicyNotice'
 
 type SortMode = 'new' | 'helpful'
 
+const POST_DATE_FORMATTER = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  weekday: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+})
+
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(value))
+  return POST_DATE_FORMATTER.format(new Date(value))
 }
 
 function renderBody(body: string, onReference: (postNo: number) => void): ReactNode[] {

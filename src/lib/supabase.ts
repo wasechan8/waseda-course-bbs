@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim()
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim()
@@ -15,7 +15,9 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
     })
   : null
 
-export async function ensureAnonymousSession() {
+let anonymousSessionRequest: Promise<Session> | null = null
+
+async function startAnonymousSession() {
   if (!supabase) {
     throw new Error('BBSは現在セットアップ中です')
   }
@@ -36,4 +38,14 @@ export async function ensureAnonymousSession() {
     throw new Error('匿名セッションを開始できませんでした')
   }
   return signInResult.data.session
+}
+
+export function ensureAnonymousSession() {
+  if (anonymousSessionRequest) return anonymousSessionRequest
+
+  const request = startAnonymousSession()
+  anonymousSessionRequest = request
+  return request.finally(() => {
+    if (anonymousSessionRequest === request) anonymousSessionRequest = null
+  })
 }

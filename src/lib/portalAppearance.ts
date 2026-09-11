@@ -49,16 +49,8 @@ export function getPortalAssetUrl(path: string | null, version = '') {
   return version ? `${data.publicUrl}?v=${encodeURIComponent(version)}` : data.publicUrl
 }
 
-function cssBackgroundUrl(url: string) {
-  return url ? `url("${url.replaceAll('"', '%22')}")` : 'none'
-}
-
 export function applyPortalAppearance(appearance: PortalAppearance) {
-  const desktopUrl = getPortalAssetUrl(appearance.desktopPath, appearance.updatedAt)
-  const mobileUrl = getPortalAssetUrl(appearance.mobilePath, appearance.updatedAt) || desktopUrl
   const root = document.documentElement
-  root.style.setProperty('--portal-background-desktop', cssBackgroundUrl(desktopUrl))
-  root.style.setProperty('--portal-background-mobile', cssBackgroundUrl(mobileUrl))
   root.style.setProperty('--portal-background-desktop-opacity', String(appearance.desktopOpacity))
   root.style.setProperty('--portal-background-mobile-opacity', String(appearance.mobileOpacity))
 }

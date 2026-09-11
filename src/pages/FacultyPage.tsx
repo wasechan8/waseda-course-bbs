@@ -52,10 +52,6 @@ export function FacultyPage() {
       .finally(() => setLoading(false))
   }, [facultySlug])
 
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [query, term, day, period])
-
   const terms = useMemo(
     () => [...new Set(courses.map((course) => course.term).filter((value): value is string => Boolean(value)))].sort(
       (left, right) => {
@@ -101,6 +97,7 @@ export function FacultyPage() {
     setTerm('')
     setDay('')
     setPeriod('')
+    setVisibleCount(PAGE_SIZE)
   }
 
   return (
@@ -122,14 +119,24 @@ export function FacultyPage() {
           <span>検索</span>
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setVisibleCount(PAGE_SIZE)
+            }}
             placeholder="科目名・教員名・科目コード"
             aria-label="科目を検索"
           />
         </label>
         <label className="select-field">
           <span>学期</span>
-          <select value={term} onChange={(event) => setTerm(event.target.value)} aria-label="学期で絞り込む">
+          <select
+            value={term}
+            onChange={(event) => {
+              setTerm(event.target.value)
+              setVisibleCount(PAGE_SIZE)
+            }}
+            aria-label="学期で絞り込む"
+          >
             <option value="">すべての学期</option>
             {primaryTerms.length > 0 && (
               <optgroup label="通常の学期・クォーター">
@@ -145,14 +152,28 @@ export function FacultyPage() {
         </label>
         <label className="select-field">
           <span>曜日</span>
-          <select value={day} onChange={(event) => setDay(event.target.value)} aria-label="曜日で絞り込む">
+          <select
+            value={day}
+            onChange={(event) => {
+              setDay(event.target.value)
+              setVisibleCount(PAGE_SIZE)
+            }}
+            aria-label="曜日で絞り込む"
+          >
             <option value="">すべての曜日</option>
             {DAYS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
           </select>
         </label>
         <label className="select-field">
           <span>時限</span>
-          <select value={period} onChange={(event) => setPeriod(event.target.value)} aria-label="時限で絞り込む">
+          <select
+            value={period}
+            onChange={(event) => {
+              setPeriod(event.target.value)
+              setVisibleCount(PAGE_SIZE)
+            }}
+            aria-label="時限で絞り込む"
+          >
             <option value="">すべての時限</option>
             {PERIODS.map((item) => <option key={item} value={item}>{item}限</option>)}
           </select>

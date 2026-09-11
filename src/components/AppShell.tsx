@@ -1,11 +1,13 @@
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { applySiteTheme, DEFAULT_THEME_KEY, isThemeKey } from '../lib/siteTheme'
-import { applyPortalAppearance, normalizePortalAppearance } from '../lib/portalAppearance'
+import { applyPortalAppearance, normalizePortalAppearance, type PortalAppearance } from '../lib/portalAppearance'
+import { SiteAppearanceContext } from '../lib/siteAppearanceContext'
 
 export function AppShell({ children }: PropsWithChildren) {
   const { pathname } = useLocation()
+  const [appearance, setAppearance] = useState<PortalAppearance | null>(null)
 
   useEffect(() => {
     const client = supabase
@@ -19,7 +21,9 @@ export function AppShell({ children }: PropsWithChildren) {
         .eq('id', 'global')
         .maybeSingle()
       if (isThemeKey(data?.theme_key)) applySiteTheme(data.theme_key)
-      applyPortalAppearance(normalizePortalAppearance(data))
+      const nextAppearance = normalizePortalAppearance(data)
+      applyPortalAppearance(nextAppearance)
+      setAppearance(nextAppearance)
     }
 
     void loadAppearance()
@@ -33,7 +37,11 @@ export function AppShell({ children }: PropsWithChildren) {
   }, [])
 
   if (pathname === '/') {
-    return <main className="portal-shell">{children}</main>
+    return (
+      <SiteAppearanceContext value={appearance}>
+        <main className="portal-shell">{children}</main>
+      </SiteAppearanceContext>
+    )
   }
 
   return (

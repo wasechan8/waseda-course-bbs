@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
@@ -55,14 +55,24 @@ export function RecentPostsFeed() {
   const [posts, setPosts] = useState<RecentPost[]>([])
   const [courseIndex, setCourseIndex] = useState<Record<string, CourseIndexEntry>>({})
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const loadRequest = useRef<Promise<void> | null>(null)
 
-  const load = useCallback(async () => {
-    if (!supabase) return
-    const { data, error } = await supabase.rpc('latest_bbs_posts', { p_limit: 10 })
-    if (!error) {
-      setPosts((data ?? []) as RecentPost[])
-      setUpdatedAt(new Date())
-    }
+  const load = useCallback(() => {
+    const client = supabase
+    if (!client) return Promise.resolve()
+    if (loadRequest.current) return loadRequest.current
+
+    loadRequest.current = (async () => {
+      const { data, error } = await client.rpc('latest_bbs_posts', { p_limit: 10 })
+      if (!error) {
+        setPosts((data ?? []) as RecentPost[])
+        setUpdatedAt(new Date())
+      }
+    })().finally(() => {
+      loadRequest.current = null
+    })
+
+    return loadRequest.current
   }, [])
 
   useEffect(() => {
@@ -75,14 +85,20 @@ export function RecentPostsFeed() {
   useEffect(() => {
     const client = supabase
     if (!isSupabaseConfigured || !client) return
-    void load()
-    const interval = window.setInterval(() => void load(), 15000)
+    const loadWhenVisible = () => {
+      if (!document.hidden) void load()
+    }
+
+    loadWhenVisible()
+    const interval = window.setInterval(loadWhenVisible, 15000)
+    document.addEventListener('visibilitychange', loadWhenVisible)
     const channel = client
       .channel('portal-recent-posts')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bbs_posts' }, () => void load())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bbs_posts' }, loadWhenVisible)
       .subscribe()
     return () => {
       window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', loadWhenVisible)
       void client.removeChannel(channel)
     }
   }, [load])

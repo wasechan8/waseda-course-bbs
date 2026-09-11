@@ -1,35 +1,11 @@
-import { useEffect, useState } from 'react'
+import { use } from 'react'
 import { Link } from 'react-router-dom'
 import { RecentPostsFeed } from '../components/RecentPostsFeed'
-import { getPortalAssetUrl, normalizePortalAppearance, type PortalAppearance } from '../lib/portalAppearance'
-import { supabase } from '../lib/supabase'
+import { getPortalAssetUrl } from '../lib/portalAppearance'
+import { SiteAppearanceContext } from '../lib/siteAppearanceContext'
 
 export function EntrancePage() {
-  const [appearance, setAppearance] = useState<PortalAppearance | null>(null)
-
-  useEffect(() => {
-    const client = supabase
-    if (!client) return
-
-    const loadBackground = async () => {
-      const { data } = await client
-        .from('site_theme')
-        .select('desktop_background_path, mobile_background_path, desktop_background_opacity, mobile_background_opacity, updated_at')
-        .eq('id', 'global')
-        .maybeSingle()
-      setAppearance(normalizePortalAppearance(data))
-    }
-
-    void loadBackground()
-    const channel = client
-      .channel('portal-background-image')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_theme' }, () => void loadBackground())
-      .subscribe()
-
-    return () => {
-      void client.removeChannel(channel)
-    }
-  }, [])
+  const appearance = use(SiteAppearanceContext)
 
   const desktopBackgroundUrl = appearance ? getPortalAssetUrl(appearance.desktopPath, appearance.updatedAt) : ''
   const mobileBackgroundUrl = appearance

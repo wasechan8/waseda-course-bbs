@@ -1,13 +1,24 @@
 import type { Course, Faculty } from '../types/catalog'
 
 const dataUrl = (path: string) => `${import.meta.env.BASE_URL}data/${path}`
+const jsonRequests = new Map<string, Promise<unknown>>()
 
-async function readJson<T>(path: string): Promise<T> {
-  const response = await fetch(dataUrl(path))
-  if (!response.ok) {
-    throw new Error('科目データを読み込めませんでした')
-  }
-  return response.json() as Promise<T>
+function readJson<T>(path: string): Promise<T> {
+  const cached = jsonRequests.get(path) as Promise<T> | undefined
+  if (cached) return cached
+
+  const request = fetch(dataUrl(path))
+    .then((response) => {
+      if (!response.ok) throw new Error('科目データを読み込めませんでした')
+      return response.json() as Promise<T>
+    })
+    .catch((error: unknown) => {
+      jsonRequests.delete(path)
+      throw error
+    })
+
+  jsonRequests.set(path, request)
+  return request
 }
 
 export function getFaculties() {
