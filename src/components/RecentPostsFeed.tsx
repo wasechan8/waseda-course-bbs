@@ -123,7 +123,7 @@ export function RecentPostsFeed() {
           const facultyAbbreviation = course ? FACULTY_ABBREVIATIONS[course.facultySlug] : null
           const campusAbbreviation = post.campus_slug ? CAMPUS_ABBREVIATIONS[post.campus_slug] : null
           const boardName = loungeId
-            ? `喫煙所（${campusAbbreviation ?? '他'}）`
+            ? `ラウンジ（${campusAbbreviation ?? '他'}）`
             : course
               ? `${facultyAbbreviation ?? course.facultySlug}　${course.name}`
               : '科目掲示板'

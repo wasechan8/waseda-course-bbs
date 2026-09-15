@@ -107,7 +107,7 @@ export function DirectoryPage() {
                   </li>
                 ))}
                 <li className="lounge-link">
-                  <Link to={`/campus/${campus.slug}/lounge`}>喫煙所</Link>
+                  <Link to={`/campus/${campus.slug}/lounge`}>ラウンジ</Link>
                 </li>
               </ul>
             </section>
@@ -116,7 +116,7 @@ export function DirectoryPage() {
       </div>
 
       <p className="entrance-note">
-        科目ページは情報交換のための固定掲示板です。自由な話題は各キャンパスの喫煙所を利用してください。
+        科目ページは情報交換のための固定掲示板です。自由な話題は各キャンパスのラウンジを利用してください。
       </p>
     </div>
   )

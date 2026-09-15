@@ -49,8 +49,8 @@ export function LoungePage() {
       const errorMessage = getErrorMessage(error, '')
       setMessage(
         errorMessage.includes('lounge_threads')
-          ? '喫煙所は準備中です。Supabaseに追加migrationを適用すると利用できます。'
-          : getErrorMessage(error, '喫煙所を読み込めませんでした'),
+          ? 'ラウンジは準備中です。Supabaseに追加migrationを適用すると利用できます。'
+          : getErrorMessage(error, 'ラウンジを読み込めませんでした'),
       )
       setLoadFailed(true)
     } finally {
@@ -96,11 +96,11 @@ export function LoungePage() {
         <Link to="/">わせチャン</Link>
         <span> &gt; </span>
         <Link to="/boards">{campus.label}</Link>
-        <span> &gt; 喫煙所</span>
+        <span> &gt; ラウンジ</span>
       </nav>
 
       <header className="board-title-bar">
-        <h1>{campus.label} 喫煙所</h1>
+        <h1>{campus.label} ラウンジ</h1>
         <span>雑談・学生生活</span>
       </header>
 
@@ -133,7 +133,7 @@ export function LoungePage() {
       {message && <StatusNotice>{message}</StatusNotice>}
 
       {!isSupabaseConfigured ? (
-        <StatusNotice setup>喫煙所は準備中です。Supabase接続後に利用できます。</StatusNotice>
+        <StatusNotice setup>ラウンジは準備中です。Supabase接続後に利用できます。</StatusNotice>
       ) : loading ? (
         <div className="empty-state">読み込み中...</div>
       ) : loadFailed ? null : threads.length === 0 ? (
@@ -183,13 +183,13 @@ export function LoungeThreadPage() {
         <span> &gt; </span>
         <Link to="/boards">{campus.label}</Link>
         <span> &gt; </span>
-        <Link to={`/campus/${campus.slug}/lounge`}>喫煙所</Link>
+        <Link to={`/campus/${campus.slug}/lounge`}>ラウンジ</Link>
         {thread && <span> &gt; {thread.title}</span>}
       </nav>
 
       {message && <StatusNotice>{message}</StatusNotice>}
       {!isSupabaseConfigured ? (
-        <StatusNotice setup>喫煙所は準備中です。</StatusNotice>
+        <StatusNotice setup>ラウンジは準備中です。</StatusNotice>
       ) : !thread ? (
         <div className="empty-state">読み込み中...</div>
       ) : (
@@ -197,7 +197,7 @@ export function LoungeThreadPage() {
           <header className="course-header lounge-thread-header">
             <h1>{thread.title}</h1>
             <div className="course-detail-meta">
-              <span>{campus.label} 喫煙所</span>
+              <span>{campus.label} ラウンジ</span>
               <span>{thread.reply_count}レス</span>
             </div>
           </header>
