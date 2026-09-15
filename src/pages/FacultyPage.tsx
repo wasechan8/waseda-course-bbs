@@ -25,6 +25,30 @@ const PRIMARY_TERM_ORDER = [
   '冬クォーター',
 ]
 const PRIMARY_TERM_RANK = new Map(PRIMARY_TERM_ORDER.map((item, index) => [item, index]))
+const CURRICULUM_CATEGORY_GROUPS = [
+  {
+    label: '科目区分',
+    options: ['ミニマムディシプリン', '専門・学際'],
+  },
+  {
+    label: 'コース科目',
+    options: [
+      '平和・国際協力コース',
+      '多文化社会・共生コース',
+      'サスティナビリティコース',
+      'コミュニティ・社会デザインコース',
+      '組織・社会イノベーションコース',
+    ],
+  },
+  {
+    label: 'ゼミナール',
+    options: ['ゼミナールI', 'ゼミナールII', 'ゼミナールIII'],
+  },
+  {
+    label: '外国語・その他',
+    options: ['必修英語', '教養外国語', '自由科目'],
+  },
+]
 
 export function FacultyPage() {
   const { facultySlug = '' } = useParams()
@@ -34,6 +58,7 @@ export function FacultyPage() {
   const [term, setTerm] = useState('')
   const [day, setDay] = useState('')
   const [period, setPeriod] = useState('')
+  const [curriculumCategory, setCurriculumCategory] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +66,7 @@ export function FacultyPage() {
   useEffect(() => {
     setLoading(true)
     setError(null)
+    setCurriculumCategory('')
     Promise.all([getFaculties(), getCourses(facultySlug)])
       .then(([facultyList, courseList]) => {
         setFaculty(facultyList.find((item) => item.slug === facultySlug) ?? null)
@@ -75,6 +101,10 @@ export function FacultyPage() {
     return courses.filter((course) => {
       if (term && course.term !== term) return false
       if (
+        curriculumCategory &&
+        !(course.curriculumCategories ?? []).includes(curriculumCategory)
+      ) return false
+      if (
         (selectedDay || selectedPeriod) &&
         !(course.slots ?? []).some(
           (slot) =>
@@ -87,9 +117,9 @@ export function FacultyPage() {
         .filter(Boolean)
         .some((value) => value!.toLocaleLowerCase('ja-JP').includes(normalizedQuery))
     })
-  }, [courses, query, term, day, period])
+  }, [courses, query, term, day, period, curriculumCategory])
 
-  const hasFilters = Boolean(query || term || day || period)
+  const hasFilters = Boolean(query || term || day || period || curriculumCategory)
   const campus = getCampusForFaculty(facultySlug)
 
   function clearFilters() {
@@ -97,6 +127,7 @@ export function FacultyPage() {
     setTerm('')
     setDay('')
     setPeriod('')
+    setCurriculumCategory('')
     setVisibleCount(PAGE_SIZE)
   }
 
@@ -178,6 +209,26 @@ export function FacultyPage() {
             {PERIODS.map((item) => <option key={item} value={item}>{item}限</option>)}
           </select>
         </label>
+        {facultySlug === 'social_sciences' && (
+          <label className="select-field curriculum-filter-field">
+            <span>学科目区分</span>
+            <select
+              value={curriculumCategory}
+              onChange={(event) => {
+                setCurriculumCategory(event.target.value)
+                setVisibleCount(PAGE_SIZE)
+              }}
+              aria-label="学科目区分で絞り込む"
+            >
+              <option value="">すべての学科目区分</option>
+              {CURRICULUM_CATEGORY_GROUPS.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((option) => <option key={option}>{option}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       {error && <StatusNotice>{error}</StatusNotice>}

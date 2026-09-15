@@ -557,6 +557,14 @@ a:visited {
   gap: 7px;
 }
 
+.curriculum-filter-field {
+  grid-column: 1 / -1;
+}
+
+.curriculum-filter-field select {
+  max-width: 380px;
+}
+
 .search-field > span,
 .select-field > span {
   flex: none;

@@ -15,6 +15,9 @@ from urllib.parse import urlencode
 DEFAULT_SOURCE = Path(__file__).resolve().parents[2] / "waseda-classes" / "scraper"
 DEFAULT_OVERLAY_SOURCE = DEFAULT_SOURCE / "catalog"
 DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "public" / "data"
+SOCIAL_SCIENCES_CURRICULUM = (
+    Path(__file__).resolve().parent / "data" / "social_sciences_curriculum_2026.json"
+)
 
 FACULTY_LABELS = {
     "politics_economics": "政治経済学部",
@@ -134,9 +137,27 @@ def source_csv_files(sources: list[Path]) -> list[Path]:
     return [selected[name] for name in sorted(selected)]
 
 
+def load_social_sciences_curriculum() -> dict[str, list[str]]:
+    payload = json.loads(SOCIAL_SCIENCES_CURRICULUM.read_text(encoding="utf-8"))
+    courses = payload.get("courses")
+    if not isinstance(courses, dict):
+        raise ValueError(f"{SOCIAL_SCIENCES_CURRICULUM.name}: courses must be an object")
+    if not all(
+        isinstance(name, str)
+        and isinstance(categories, list)
+        and all(isinstance(category, str) for category in categories)
+        for name, categories in courses.items()
+    ):
+        raise ValueError(
+            f"{SOCIAL_SCIENCES_CURRICULUM.name}: invalid course category mapping"
+        )
+    return courses
+
+
 def build_catalog(sources: list[Path], output: Path) -> None:
     courses_by_faculty: dict[str, list[dict[str, object]]] = defaultdict(list)
     seen_ids_by_faculty: dict[str, set[str]] = defaultdict(set)
+    social_sciences_curriculum = load_social_sciences_curriculum()
 
     for csv_path in source_csv_files(sources):
         faculty_slug = faculty_slug_from_filename(csv_path)
@@ -161,23 +182,26 @@ def build_catalog(sources: list[Path], output: Path) -> None:
                 except ValueError:
                     credits = None
 
-                courses_by_faculty[faculty_slug].append(
-                    {
-                        "id": course_id,
-                        "code": text(row.get("course_code_full") or row.get("course_code")),
-                        "name": text(row.get("name")),
-                        "teacher": text(row.get("teacher")) or None,
-                        "faculty": FACULTY_LABELS[faculty_slug],
-                        "facultySlug": faculty_slug,
-                        "term": text(row.get("term")) or None,
-                        "schedule": text(row.get("schedule")) or None,
-                        "slots": parse_schedule(row.get("schedule")),
-                        "credits": credits,
-                        "methodType": text(row.get("method_type")) or None,
-                        "year": int(text(row.get("year")) or 0) or None,
-                        "syllabusUrl": syllabus_url(row.get("p_key")),
-                    }
-                )
+                course: dict[str, object] = {
+                    "id": course_id,
+                    "code": text(row.get("course_code_full") or row.get("course_code")),
+                    "name": text(row.get("name")),
+                    "teacher": text(row.get("teacher")) or None,
+                    "faculty": FACULTY_LABELS[faculty_slug],
+                    "facultySlug": faculty_slug,
+                    "term": text(row.get("term")) or None,
+                    "schedule": text(row.get("schedule")) or None,
+                    "slots": parse_schedule(row.get("schedule")),
+                    "credits": credits,
+                    "methodType": text(row.get("method_type")) or None,
+                    "year": int(text(row.get("year")) or 0) or None,
+                    "syllabusUrl": syllabus_url(row.get("p_key")),
+                }
+                if faculty_slug == "social_sciences":
+                    course["curriculumCategories"] = social_sciences_curriculum.get(
+                        text(row.get("name")), []
+                    )
+                courses_by_faculty[faculty_slug].append(course)
 
     courses_output = output / "courses"
     courses_output.mkdir(parents=True, exist_ok=True)

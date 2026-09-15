@@ -18,6 +18,7 @@ export type Course = {
   methodType: string | null
   year: number | null
   syllabusUrl: string | null
+  curriculumCategories?: string[]
 }
 
 export type CourseSlot = {
